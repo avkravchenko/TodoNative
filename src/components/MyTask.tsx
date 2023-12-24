@@ -1,10 +1,11 @@
 import React from "react";
 import { StyleSheet, Text, View, FlatList, Pressable } from "react-native";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { toggleMode, toggleTodo } from "@/store/taskSlice";
 import { deleteTodo } from "@/store/taskSlice";
 import { editTodo } from "@/store/taskSlice";
 import BouncyCheckbox from "react-native-bouncy-checkbox";
+import { RootState } from "@/store";
 
 type Props = {
   item: {
@@ -16,12 +17,16 @@ type Props = {
 
 const MyTask = ({ item }: Props) => {
   const dispatch = useDispatch();
+  const mode = useSelector((state: RootState) => state.todoReducer.mode);
 
   const handleToggleTodo = (id: string) => {
     dispatch(toggleTodo(id));
   };
 
   const handleDelete = (id: string) => {
+    if (mode === "edit") {
+      dispatch(toggleMode("create"));
+    }
     dispatch(deleteTodo(id));
   };
 

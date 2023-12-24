@@ -1,5 +1,5 @@
 import { StyleSheet, View } from "react-native";
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useDispatch, useSelector } from "react-redux";
 import { addTodo } from "@/store/taskSlice";
@@ -31,7 +31,8 @@ const MyForm = (props: Props) => {
     ) ?? null;
 
   const dispatch = useDispatch();
-  const { control, handleSubmit, reset } = useForm<FormData>();
+
+  const { control, handleSubmit, reset, setValue } = useForm<FormData>({});
 
   const onSubmit = (data: FormData) => {
     if (mode === "create") {
@@ -44,12 +45,22 @@ const MyForm = (props: Props) => {
       dispatch(addTodo(todo));
       reset();
     } else if (mode === "edit" && editTodo) {
-      const editedTodo = { ...editTodo, text: data.taskName };
+      const editedTodo = { ...editTodo, text: data.taskName, isEdit: false };
       dispatch(changeEditedTodo(editedTodo));
       dispatch(toggleMode("create"));
-      reset();
+      reset({
+        taskName: "",
+      });
     }
   };
+
+  useEffect(() => {
+    if (editTodo) {
+      reset({
+        taskName: editTodo.text,
+      });
+    }
+  }, [editTodo]);
 
   return (
     <View style={styles.container}>
