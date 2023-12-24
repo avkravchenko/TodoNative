@@ -1,6 +1,19 @@
-import { StyleSheet, Text, TextInput, View } from "react-native";
-import React, { useState } from "react";
+import {
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  useWindowDimensions,
+} from "react-native";
+import React from "react";
 import { Controller } from "react-hook-form";
+
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  isEdit: boolean;
+}
 
 type Props = {
   name: string;
@@ -8,9 +21,11 @@ type Props = {
   rules: {
     required: string;
   };
+  mode: string;
+  editValue: Todo | null;
 };
 
-const MyInput = ({ control, rules }: Props) => {
+const MyInput = ({ control, rules, mode, editValue }: Props) => {
   return (
     <Controller
       name="taskName"
@@ -26,20 +41,15 @@ const MyInput = ({ control, rules }: Props) => {
               value={value}
               onChangeText={onChange}
               onBlur={onBlur}
-              placeholder="write what you want to do"
+              placeholder={
+                mode === "edit" ? editValue?.text : "write what you want to do"
+              }
               style={styles.myInput}
             />
           </View>
         </>
       )}
     />
-
-    // <View>
-    //   <TextInput
-    //     placeholder="write what you want to do"
-    //     style={styles.myInput}
-    //   />
-    // </View>
   );
 };
 
@@ -47,10 +57,13 @@ export default MyInput;
 
 const styles = StyleSheet.create({
   myInput: {
+    width: 280,
     padding: 10,
     borderStyle: "solid",
     borderWidth: 1,
     borderRadius: 15,
     borderColor: "lightgrey",
+    textDecorationLine: "none",
+    backgroundColor: "white",
   },
 });

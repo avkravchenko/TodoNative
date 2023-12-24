@@ -1,38 +1,38 @@
-import {
-  StyleSheet,
-  Text,
-  View,
-  FlatList,
-  TouchableOpacity,
-} from "react-native";
-import React from "react";
+import { StyleSheet, Text, View, FlatList, Pressable } from "react-native";
+import React, { useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store";
 import { toggleTodo } from "@/store/taskSlice";
+import { deleteTodo } from "@/store/taskSlice";
+import BouncyCheckbox from "react-native-bouncy-checkbox";
+import MyTask from "./MyTask";
 
-type Props = {};
-
-const MyTasks = (props: Props) => {
+const MyTasks = () => {
   const dispatch = useDispatch();
   const todos = useSelector((state: RootState) => state.todoReducer.list);
 
-  const handleToggleTodo = (id: string) => {
-    dispatch(toggleTodo(id));
-  };
+  const sortedTodos = useMemo(() => {
+    const sorted = [...todos];
+    sorted.sort((a, b) => {
+      if (a.completed && !b.completed) {
+        return 1;
+      }
+      if (!a.completed && b.completed) {
+        return -1;
+      }
+      return 0;
+    });
 
-  const uncompletedTodos = todos.filter((item) => !item.completed);
+    return sorted;
+  }, [todos]);
 
   return (
     <View style={styles.myTasks}>
       <Text style={styles.header}>My to do list</Text>
       <FlatList
-        data={uncompletedTodos}
+        data={sortedTodos}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity onPress={() => handleToggleTodo(item.id)}>
-            <Text>{item.text}</Text>
-          </TouchableOpacity>
-        )}
+        renderItem={({ item }) => <MyTask item={item} />}
       />
     </View>
   );
@@ -44,9 +44,13 @@ const styles = StyleSheet.create({
   myTasks: {
     marginTop: 50,
     width: "90%",
-    backgroundColor: "#f5f5f5",
+    backgroundColor: "#efefef",
     borderRadius: 15,
     padding: 10,
+    gap: 10,
+    maxHeight: 750,
+    marginBottom: 120,
+    zIndex: 1,
   },
   header: {
     fontSize: 20,
